@@ -1,0 +1,894 @@
+[
+ {
+  "id": "chk-oregon-credit-condition",
+  "kind": "judgment",
+  "severity": "medium",
+  "area": "california",
+  "engine": "missed",
+  "title": "California credit for Oregon tax ($844) depends on a condition nobody checked",
+  "plain": "California normally gives no credit for tax paid to Oregon. The exception is a group (composite) return, which this is, but only if Oregon's group return does not already give its own credit for California tax.",
+  "detail": "Engine rule R-CA-OSTC claimed 844 on Schedule S. FTB 2025 Schedule S instructions: Oregon is not among the states listed for residents; residents included in a group nonresident return filed with AZ, OR or VA 'may also claim a credit' unless that state allows a credit for taxes paid to California on the group return. D39 p2: Oregon composite, 1,580 paid on Erik's behalf. Confirm with Woodworks how the composite was computed; if Oregon allowed a California credit, remove the 844 (California tax +844).",
+  "fix": "Confirm the Oregon composite computation with the S corporation; record the answer as a judgment.",
+  "lines": [
+   "ScheduleS.credit"
+  ],
+  "sources": [
+   "doc:D39#page2",
+   "ev-0982"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-election-section-179",
+  "kind": "judgment",
+  "severity": "medium",
+  "area": "business",
+  "engine": "missed",
+  "title": "Electing section 179 for the studio equipment saves California $1,050",
+  "plain": "The engine took 100% bonus depreciation. Expensing the same equipment under section 179 gives the same federal result, but California allows section 179 (up to $25,000) and not bonus, so California tax drops.",
+  "detail": "what_if 'equipment_section179': federal +0, California -1,050. Changes F4562-C.12 0 -> 38,000 and F4562-C.14 38,000 -> 0; SchCA540NR.12.C 30,400 -> 10,400. An election is a judgment call: record it with the partner's approval.",
+  "fix": "Elect section 179 on Form 4562 Part I (federal and California).",
+  "lines": [
+   "F4562-C.12",
+   "F4562-C.14",
+   "SchCA540NR.12.C"
+  ],
+  "sources": [
+   "doc:D22#page1",
+   "qa-18",
+   "call-01"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": -1050
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-form-3520-unresolved",
+  "kind": "judgment",
+  "severity": "medium",
+  "area": "investments_and_digital_assets",
+  "engine": "missed",
+  "title": "2023 Form 3520 for the Swedish inheritance was never resolved",
+  "plain": "Erik inherited the Swedish account from Birgitta Lindqvist in 09/2023. A foreign inheritance over $100,000 must be reported on Form 3520. The prior preparer flagged it and never closed it.",
+  "detail": "D07 p3 open item: '2023 Form 3520 (foreign inheritance over 100,000) - discussed? (no note of resolution)'. D36: 'Account opened 09/2023 (inheritance from Birgitta Lindqvist)'. qa-07 confirms. Not on the 2025 return and outside this engagement (D01), but late-filing penalties can reach 25% of the gift; must be raised with the client in writing.",
+  "fix": "Tell the client in writing; offer a separate engagement (reasonable-cause statement).",
+  "lines": [
+   "SchB.7a"
+  ],
+  "sources": [
+   "doc:D07#page3",
+   "doc:D36#page1",
+   "qa-07",
+   "doc:D01#page1"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-corrected-1099-applied",
+  "kind": "verified",
+  "severity": "low",
+  "area": "investments_and_digital_assets",
+  "engine": "handled",
+  "title": "Corrected Meridian 1099 applied correctly (3 lots changed)",
+  "plain": "Meridian sent a corrected 1099 in March. We compared it page by page with the original: three sales changed, and the return uses the corrected numbers with no leftovers from the old form.",
+  "detail": "Pages that differ: [4, 6, 8]. M6 wash sale 735 -> 512; M9 basis 6,900 -> 4,880; M14 acquired 2024-10-15 -> 2024-09-15 (short -> long-term, moved from box A to box D in v2). D30 is superseded; no line uses it.",
+  "fix": "No change.",
+  "lines": [
+   "F8949.A.M6",
+   "F8949.D.M9",
+   "F8949.D.M14"
+  ],
+  "sources": [
+   "doc:D31#page4",
+   "doc:D31#page6",
+   "doc:D31#page8",
+   "doc:D30#page4"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-rsu-basis-zero",
+  "kind": "error",
+  "severity": "high",
+  "area": "wages_and_stock_compensation",
+  "engine": "missed",
+  "title": "RSU shares taxed twice: $47,620 of basis missing",
+  "plain": "The broker left the cost blank for RSU shares, so the return used $0. That income was already taxed on the W-2, so it is being taxed a second time as a capital gain.",
+  "detail": "1099-B reports noncovered RSU lots with blank basis. Corvane's supplemental statement (D11 p2) gives the adjusted basis (FMV at vest, already in W-2 box 1). Enter it with adjustment code B.",
+  "fix": "Use adjusted basis from D11; code B on Form 8949.",
+  "lines": [
+   "F8949.B.N1",
+   "F8949.B.N3",
+   "F8949.E.N4",
+   "SchD.2",
+   "SchD.9"
+  ],
+  "sources": [
+   "doc:D11#page2",
+   "D08",
+   "D28"
+  ],
+  "tax_effect": {
+   "federal": -15536,
+   "california": -1618
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-ca-wages-after-move",
+  "kind": "error",
+  "severity": "high",
+  "area": "california",
+  "engine": "missed",
+  "title": "California wages overstated by $88,831",
+  "plain": "The family stopped being California residents on 2025-07-14. The return counts all of Halvorsen's salary as California income, including pay earned while living in Texas.",
+  "detail": "R-CA-WAGES-SOURCE used W-2 box 16 (111,300); the employer kept CA as work state until 9/30 by mistake (qa-45). Paystub D73: CA taxable wages through 07/15/2025 = 22,469. CA wages = Corvane 107,100 + 22,469 = 129,569. The 4,180 CA withholding is still a credit.",
+  "fix": "Source Halvorsen wages by residency dates; keep CA withholding.",
+  "lines": [
+   "SchCA540NR.1.E"
+  ],
+  "sources": [
+   "doc:D73#page1",
+   "ev-1081",
+   "D09",
+   "ev-0047",
+   "household:ngozi",
+   "qa-02",
+   "qa-03",
+   "qa-45"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": -5685
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-1099k-already-in-books",
+  "kind": "error",
+  "severity": "high",
+  "area": "business",
+  "engine": "missed",
+  "title": "Same $12,400 counted twice in gross receipts",
+  "plain": "A client paid Erik by card through Paywell. That money is already in the books' sales. The engine added Paywell's 1099-K on top, so it is counted twice.",
+  "detail": "SchC.1 163,700 = books 151,300 + 1099-K 12,400 (R-SCHC-GROSS). D15 p3: Atlas paid 41,200, of which 12,400 through Paywell, deposited gross into Sales. 1099-NECs 142,000 + no-1099 clients 9,300 = books 151,300. The 2028 IRS exam asks for this reconciliation.",
+  "fix": "Gross receipts = books; keep the NEC/K to books reconciliation.",
+  "lines": [
+   "SchC.1"
+  ],
+  "sources": [
+   "doc:D15#page3",
+   "D21",
+   "D14",
+   "D17"
+  ],
+  "tax_effect": {
+   "federal": -4402,
+   "california": -384
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-duplicate-page",
+  "kind": "error",
+  "severity": "high",
+  "area": "business",
+  "engine": "missed",
+  "title": "Mileage log page counted twice",
+  "plain": "Page 3 of the mileage log is a second scan of page 2. The engine added up every page, so business miles became 11,800 instead of 8,100.",
+  "detail": "Page 3 text is identical to page 2 (marked 'Second scan'). R-MILEAGE-PAGE-TOTALS summed all pages. 8,100 mi x 0.7 = 5,670 vs 8,260. Total odometer miles 17,740, so 8,100 business miles is plausible.",
+  "fix": "Exclude page 3.",
+  "lines": [
+   "SchC.44a",
+   "SchC.9"
+  ],
+  "sources": [
+   "doc:D23#page2",
+   "doc:D23#page3",
+   "ref:param.mileage_rate"
+  ],
+  "tax_effect": {
+   "federal": 919,
+   "california": 80
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-sehi-employer-plan",
+  "kind": "error",
+  "severity": "high",
+  "area": "business",
+  "engine": "missed",
+  "title": "Self-employed health insurance not allowed",
+  "plain": "Erik could have joined his wife's employer family plan, so his own premiums can't be deducted.",
+  "detail": "IRC 162(l)(2)(B): no deduction for any month the taxpayer is eligible to participate in a subsidized plan of an employer of the spouse. qa-25: both of Ngozi's employers offered family coverage all year.",
+  "fix": "Remove the deduction (authority: IRC 162(l)(2)(B)).",
+  "lines": [
+   "Sch1.17"
+  ],
+  "sources": [
+   "qa-25",
+   "D25",
+   "ev-0484"
+  ],
+  "tax_effect": {
+   "federal": 4464,
+   "california": 605
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-repair-is-improvement",
+  "kind": "error",
+  "severity": "medium",
+  "area": "rentals_and_sale",
+  "engine": "missed",
+  "title": "HVAC replacement deducted as a repair",
+  "plain": "Putting in a whole new heating and cooling system is an improvement. It has to be depreciated over 27.5 years, not deducted all at once.",
+  "detail": "D47: removed furnace and condenser; installed new heat pump, air handler, line set and thermostat; permit B25-31877. Restoration/betterment under Reg. 1.263(a)-3. The engine's own what-if for this change: federal +3,633, California +896.",
+  "fix": "Capitalize 11,000 as SAC-HVAC-2025; depreciate.",
+  "lines": [
+   "SchE.14A",
+   "SchE.18A"
+  ],
+  "sources": [
+   "doc:D47#page1",
+   "D46",
+   "qa-37",
+   "call-01"
+  ],
+  "tax_effect": {
+   "federal": 3633,
+   "california": 896
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-property-tax-proration",
+  "kind": "error",
+  "severity": "medium",
+  "area": "deductions_and_credits",
+  "engine": "missed",
+  "title": "Property tax ignores the seller's share",
+  "plain": "When the family bought the house, the seller paid the county taxes for January to July 7 through a credit at closing. Only the family's own share can be deducted.",
+  "detail": "D54: seller credit 6,912.00 for 01/01/2025-07/07/2025. Buyer deducts 13,420 - 6,912 = 6,508 (IRC 164(d)). SALT 41,290 -> 34,378, now under the 40,000 cap, so itemized deductions fall 5,622.",
+  "fix": "Real estate taxes = levy minus seller credit.",
+  "lines": [
+   "SchA.5b",
+   "SchA.5e"
+  ],
+  "sources": [
+   "doc:D54#page1",
+   "D58",
+   "D57",
+   "ev-1036"
+  ],
+  "tax_effect": {
+   "federal": 1462,
+   "california": 602
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-vehicle-over-proceeds",
+  "kind": "error",
+  "severity": "medium",
+  "area": "deductions_and_credits",
+  "engine": "missed",
+  "title": "Car donation claimed at $6,000; charity sold it for $2,900",
+  "plain": "When a charity sells a donated car, you can deduct only what it sold for, not the Blue Book value.",
+  "detail": "1098-C box 4a checked, box 4c gross proceeds 2,900.00. IRC 170(f)(12)(A)(ii) limits the deduction to gross proceeds. R-NONCASH-GIFT used the client's estimate (qa-39). Under IRS exam in 2028.",
+  "fix": "Deduction = 1098-C box 4c; attach 1098-C.",
+  "lines": [
+   "F8283.A1.vehicle",
+   "SchA.12"
+  ],
+  "sources": [
+   "doc:D66#page1",
+   "ev-1055",
+   "qa-39",
+   "call-01"
+  ],
+  "tax_effect": {
+   "federal": 806,
+   "california": 149
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-payoff-interest-double",
+  "kind": "error",
+  "severity": "medium",
+  "area": "deductions_and_credits",
+  "engine": "missed",
+  "title": "Mortgage interest at payoff counted twice ($2,150)",
+  "plain": "The payoff letter's interest is already included in the lender's Form 1098. The engine added both.",
+  "detail": "D56: 'Interest is reported on the 2025 Form 1098.' D55 box 1 13,900 'includes ... interest paid at payoff 11/20/2025'. R-MORTGAGE-INTEREST adds every 1098 and lender statement.",
+  "fix": "Remove the payoff statement amount.",
+  "lines": [
+   "SchA.8a"
+  ],
+  "sources": [
+   "doc:D56#page1",
+   "doc:D55#page1",
+   "ev-1032"
+  ],
+  "tax_effect": {
+   "federal": 559,
+   "california": 103
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-interest-twice",
+  "kind": "error",
+  "severity": "medium",
+  "area": "investments_and_digital_assets",
+  "engine": "missed",
+  "title": "Bank interest counted twice ($1,840)",
+  "plain": "The same interest shows up on the brokerage's combined statement and on the bank's own 1099-INT. It was entered from both.",
+  "detail": "D28's 1099-INT section is the Northlake Bank sweep for account 7731; D29 is Northlake Bank's 1099-INT for that same sweep. Same payer, same account, same amount.",
+  "fix": "Keep one line.",
+  "lines": [
+   "SchB.1.1",
+   "SchB.1.2"
+  ],
+  "sources": [
+   "doc:D28#page1",
+   "ev-0492",
+   "doc:D29#page1",
+   "ev-0538"
+  ],
+  "tax_effect": {
+   "federal": -640,
+   "california": -127
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-fx-wrong-year",
+  "kind": "error",
+  "severity": "low",
+  "area": "investments_and_digital_assets",
+  "engine": "missed",
+  "title": "Foreign interest converted at the 2024 rate",
+  "plain": "The engine used last year's exchange rate. With 2025's rate the Swedish interest is $1,871 not $1,747.",
+  "detail": "SEK 18,450.00 / 9.86 (2025 average) = 1,871 vs / 10.56 (2024).",
+  "fix": "Use ref:fx.SEK.2025_average.",
+  "lines": [
+   "SchB.1.6"
+  ],
+  "sources": [
+   "doc:D36#page1",
+   "ref:fx.SEK.2024_average",
+   "ref:fx.SEK.2025_average"
+  ],
+  "tax_effect": {
+   "federal": 43,
+   "california": 9
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-crypto-basis-found",
+  "kind": "error",
+  "severity": "medium",
+  "area": "investments_and_digital_assets",
+  "engine": "flagged",
+  "title": "Crypto lot C6: real cost found, and it is long-term",
+  "plain": "Erik bought this bitcoin in 2021 on another exchange, then moved it. With its $3,050 cost it is a small long-term gain, not a $5,325 short-term gain.",
+  "detail": "D35: 'TRANSFER-IN 2025-06-01 (cost basis unknown)'. msg-07: bought 03/15/2021 for ~3,050; exchange closed; bank line to CryptoNorth. Holding period runs from the original purchase. Box H -> box K.",
+  "fix": "Get the bank statement, then basis 3,050, acquired 2021-03-15, box K.",
+  "lines": [
+   "F8949.H.C6"
+  ],
+  "sources": [
+   "doc:D35#page1",
+   "msg-07",
+   "D34"
+  ],
+  "tax_effect": {
+   "federal": -1312,
+   "california": -104
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-broker-page-unread",
+  "kind": "error",
+  "severity": "low",
+  "area": "investments_and_digital_assets",
+  "engine": "flagged",
+  "title": "Meridian page 32 sale missing from the return",
+  "plain": "The pipeline didn't read the last page of the Meridian statement, so one small sale is missing.",
+  "detail": "Summary proceeds 71,965.00; page 32: M18 Ironwood REIT (fractional share cash in lieu) proceeds 250.00 basis 310.00 short-term noncovered (box B).",
+  "fix": "Add M18 to box B.",
+  "lines": [
+   "F8949.B"
+  ],
+  "sources": [
+   "doc:D31#page32",
+   "doc:D31#page1"
+  ],
+  "tax_effect": {
+   "federal": -21,
+   "california": -2
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-personal-use",
+  "kind": "error",
+  "severity": "medium",
+  "area": "business",
+  "engine": "missed",
+  "title": "Family phone, home internet and Spotify deducted in full ($1,524 personal)",
+  "plain": "Erik told us the phone is 70% business, internet 50%, and Spotify Family is personal. The return deducted all of it.",
+  "detail": "D15 p2: 4-line family plan 2,160, home internet 1,320; p1: Spotify Family 216. Call 2026-03-26. Personal: 1,308 + 216. Meals include 'team lunches with contractors' (50% OK).",
+  "fix": "Deduct business share only.",
+  "lines": [
+   "SchC.25",
+   "SchC.27a.1"
+  ],
+  "sources": [
+   "call-01",
+   "doc:D15#page2",
+   "doc:D15#page1",
+   "ev-0101",
+   "ev-0095",
+   "ev-0099"
+  ],
+  "tax_effect": {
+   "federal": 541,
+   "california": 48
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-estimates-vs-irs",
+  "kind": "error",
+  "severity": "medium",
+  "area": "payments",
+  "engine": "missed",
+  "title": "Federal estimates: return says $13,000, IRS has $12,000",
+  "plain": "For the January payment the return used the client's memory ('4,000 I think'). The IRS transcript shows $3,000.",
+  "detail": "R-ESTIMATED-PAYMENTS took qa-41 for Q4. Transcript (as of 2026-03-12): 670 on 2026-01-15 = 3,000. No EFTPS confirmation for Q4 in D67. Knock-on: the Form 2210 penalty (164) was computed with the 4,000 and is slightly understated; recompute it with 3,000 paid on 1/15/2026.",
+  "fix": "Agree estimates to the IRS transcript.",
+  "lines": [
+   "F1040.26"
+  ],
+  "sources": [
+   "qa-41",
+   "agency:/irs_account_transcript_2025/0/transactions/3",
+   "D67",
+   "D69"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": -1000,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-ca-payment-other-year",
+  "kind": "error",
+  "severity": "medium",
+  "area": "payments",
+  "engine": "missed",
+  "title": "A $3,500 payment for 2024 counted as 2025 (California)",
+  "plain": "The September payment to California was marked for tax year 2024, and California is holding it as a 2024 credit.",
+  "detail": "D68: 2025-09-15 3,500.00 'tax year 2024'. FTB account lists it under tax_year_2024_payments_after_filing. R-CA-ESTIMATED-PAYMENTS used payment dates, not the designated year.",
+  "fix": "Remove from 2025; ask FTB to transfer the 2024 credit.",
+  "lines": [
+   "F540NR.72"
+  ],
+  "sources": [
+   "doc:D68#page1",
+   "ev-1076",
+   "agency:/ftb_account/tax_year_2024_payments_after_filing/0"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": -3500
+  }
+ },
+ {
+  "id": "chk-dependent-ssn-mismatch",
+  "kind": "error",
+  "severity": "high",
+  "area": "intake_and_engagement",
+  "engine": "missed",
+  "title": "Theo's SSN on the return doesn't match his card",
+  "plain": "The SSN typed in the organizer doesn't match Theo's Social Security card or last year's return. The IRS will reject the e-file.",
+  "detail": "Organizer: XXX-XX-3309; card D71 and 2024 return: XXX-XX-3390 (transposed digits). Can be caught before transmission by agreeing dependents to the prior-year return.",
+  "fix": "Correct the SSN; re-verify all TINs against cards and prior year.",
+  "lines": [
+   "F8812.4"
+  ],
+  "sources": [
+   "household:theo",
+   "doc:D71#page1",
+   "py:/return_2024/dependents/1",
+   "msg-10"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-provider-tin-mismatch",
+  "kind": "error",
+  "severity": "low",
+  "area": "deductions_and_credits",
+  "engine": "missed",
+  "title": "Child care provider's tax ID has swapped digits",
+  "plain": "The provider's tax ID on Form 2441 doesn't match the provider's own statement.",
+  "detail": "F2441.1b: 74-3829516; D62: 74-3829156. Also D61 is 'Bright Oak Kids Club', not 'Bright Oak Preschool'.",
+  "fix": "Use name and ID from the statements.",
+  "lines": [
+   "F2441.1b"
+  ],
+  "sources": [
+   "doc:D62#page1",
+   "ev-1045"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-sep-excess",
+  "kind": "judgment",
+  "severity": "medium",
+  "area": "business",
+  "engine": "missed",
+  "title": "SEP contribution over the limit by $2,786 (more after fixes)",
+  "plain": "Erik put in more than he's allowed. The extra must be taken out, or a 6% penalty applies every year it stays in.",
+  "detail": "Contribution 18,000 vs limit 15,214.30. The limit drops further once Schedule C findings are accepted. Excess contributions are subject to a 6% excise (Form 5329) unless withdrawn with earnings by the due date (IRC 4973).",
+  "fix": "Recompute after Sch C changes; advise withdrawal of excess.",
+  "lines": [
+   "Sch1.16"
+  ],
+  "sources": [
+   "D26",
+   "ev-0485",
+   "qa-26"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-low-confidence-read",
+  "kind": "verified",
+  "severity": "low",
+  "area": "deductions_and_credits",
+  "engine": "flagged",
+  "title": "Handwritten receipt: $1,500 read at 41% confidence",
+  "plain": "The first digit could be 1 or 7. The parish and the check number confirm $1,500. We still need a proper written receipt.",
+  "detail": "ev-1049 'text_as_read' with an ambiguous first digit. msg-08: parish confirmed 1,500, check #2207. A gift of 250+ needs a contemporaneous written acknowledgment (IRC 170(f)(8)).",
+  "fix": "Keep 1,500; request typed acknowledgment.",
+  "lines": [
+   "SchA.11"
+  ],
+  "sources": [
+   "doc:D64#page1",
+   "ev-1049",
+   "msg-08"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-1099nec-not-filed",
+  "kind": "judgment",
+  "severity": "medium",
+  "area": "business",
+  "engine": "flagged",
+  "title": "Contractors paid $7,400 with no 1099-NEC filed",
+  "plain": "Erik paid two contractors by bank transfer and didn't send them 1099-NEC forms. He needs to file them late.",
+  "detail": "D27: Quintero 4,800, Patel 2,600, ACH. 1099-NEC was due 2026-02-02. Schedule C questions I/J must be answered truthfully. Late-filing penalty per form.",
+  "fix": "File late 1099-NECs now; answer Sch C I/J truthfully.",
+  "lines": [
+   "SchC.11"
+  ],
+  "sources": [
+   "D27",
+   "call-01",
+   "qa-22",
+   "qa-23"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "chk-client-answer-conflict",
+  "kind": "verified",
+  "severity": "low",
+  "area": "wages_and_stock_compensation",
+  "engine": "missed",
+  "title": "Client says no IRA basis; records show $7,000",
+  "plain": "The client thinks they had no prior basis, but last year's return and the 2024 Form 5498 show a $7,000 contribution. The return is right; we keep a note so nobody 'fixes' it.",
+  "detail": "D42: 7,000 contributed 02/12/2025 for 2024; 2024 Form 8606 line 14 = 7,000. Both 2025 distributions (7,010 + 7,016) were converted. Taxable amount 26 is correct.",
+  "fix": "No change.",
+  "lines": [
+   "F8606.2"
+  ],
+  "sources": [
+   "qa-31",
+   "D42",
+   "py:/return_2024/lines/F8606.14"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "eng-amt-credit-carryforward",
+  "kind": "diagnostic",
+  "severity": "low",
+  "area": "wages_and_stock_compensation",
+  "engine": "flagged",
+  "title": "AMT from ISO exercise creates a credit to carry forward",
+  "plain": "AMT arises from the incentive stock option exercise (a deferral item); a minimum tax credit carryforward to 2026 is expected (Form 8801 next year).",
+  "detail": "AMT arises from the incentive stock option exercise (a deferral item); a minimum tax credit carryforward to 2026 is expected (Form 8801 next year).",
+  "fix": "Resolve or document.",
+  "lines": [],
+  "sources": [
+   "F6251.11"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "eng-aotc-phased-out",
+  "kind": "diagnostic",
+  "severity": "low",
+  "area": "deductions_and_credits",
+  "engine": "flagged",
+  "title": "Education credit fully phased out for Ada",
+  "plain": "American opportunity credit fully phased out by modified AGI.",
+  "detail": "American opportunity credit fully phased out by modified AGI.",
+  "fix": "Resolve or document.",
+  "lines": [],
+  "sources": [
+   "F8863.7"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "eng-fbar-outside-return",
+  "kind": "diagnostic",
+  "severity": "low",
+  "area": "investments_and_digital_assets",
+  "engine": "flagged",
+  "title": "FBAR (FinCEN 114) due for the Swedish account",
+  "plain": "Foreign account maximum exceeds 10,000 USD: FinCEN Form 114 (FBAR) is due separately (not part of this return; not in engagement scope).",
+  "detail": "Foreign account maximum exceeds 10,000 USD: FinCEN Form 114 (FBAR) is due separately (not part of this return; not in engagement scope).",
+  "fix": "Resolve or document.",
+  "lines": [],
+  "sources": [
+   "F8938.1.max"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "eng-due-diligence-required",
+  "kind": "diagnostic",
+  "severity": "medium",
+  "area": "deductions_and_credits",
+  "engine": "flagged",
+  "title": "Form 8867 due diligence for child and dependent credits",
+  "plain": "Form 8867 must be completed by the preparer for the child tax credit and credit for other dependents.",
+  "detail": "Form 8867 must be completed by the preparer for the child tax credit and credit for other dependents.",
+  "fix": "Resolve or document.",
+  "lines": [],
+  "sources": [
+   "F8867.status"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "eng-ca-amt-not-computed",
+  "kind": "diagnostic",
+  "severity": "medium",
+  "area": "california",
+  "engine": "flagged",
+  "title": "California AMT not computed by the engine",
+  "plain": "California AMT (Schedule P 540NR) not computed: review incentive stock option exercise for California-source allocation.",
+  "detail": "California AMT (Schedule P 540NR) not computed: review incentive stock option exercise for California-source allocation.",
+  "fix": "Resolve or document.",
+  "lines": [],
+  "sources": [
+   "F6251.2i"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "eng-home-office-area-change",
+  "kind": "diagnostic",
+  "severity": "low",
+  "area": "business",
+  "engine": "flagged",
+  "title": "Home office size changed mid-year",
+  "plain": "Home office area (average 240 sq ft) differs from 2024 (300 sq ft).",
+  "detail": "Home office area (average 240 sq ft) differs from 2024 (300 sq ft).",
+  "fix": "Resolve or document.",
+  "lines": [],
+  "sources": [
+   "SchC.30"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ },
+ {
+  "id": "eng-questionnaire-sales-conflict",
+  "kind": "diagnostic",
+  "severity": "medium",
+  "area": "investments_and_digital_assets",
+  "engine": "flagged",
+  "title": "Client said 'no sales'; 294 sales were reported",
+  "plain": "Questionnaire answer: no investments sold. Documents show 282 brokerage sales and 12 digital asset dispositions.",
+  "detail": "Questionnaire answer: no investments sold. Documents show 282 brokerage sales and 12 digital asset dispositions.",
+  "fix": "Resolve or document.",
+  "lines": [],
+  "sources": [
+   "qa-14"
+  ],
+  "tax_effect": {
+   "federal": 0,
+   "california": 0
+  },
+  "payment_effect": {
+   "federal": 0,
+   "california": 0
+  }
+ }
+]
