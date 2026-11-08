@@ -1,0 +1,18 @@
+# One-click deploy on Render (render.com): New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: miraflores-workpaper
+    runtime: python
+    plan: free
+    rootDir: app
+    buildCommand: pip install -r ../requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      # Optional, for events that survive restarts: create a free Render Postgres
+      # and paste its Internal Database URL here. Without it, SQLite is used and the
+      # demo re-seeds itself whenever the free instance restarts.
+      - key: DATABASE_URL
+        sync: false
