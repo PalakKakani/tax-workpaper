@@ -138,7 +138,9 @@ async function boot() {
   try { v = localStorage.getItem("wp.viewer"); } catch {}
   S.viewer = meta.actors.some((a) => a.id === v) ? v : "st-02";
   await refresh();
-  render(html`<${App} />`, document.getElementById("app"));
+  const root = document.getElementById("app");
+  root.innerHTML = "";  // drop the "Loading" placeholder before the app mounts
+  render(html`<${App} />`, root);
   // several people at once: poll and announce what others did
   setInterval(async () => {
     if (document.hidden) return;

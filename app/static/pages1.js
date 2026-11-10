@@ -55,14 +55,18 @@ export const signCell = (s) => (s ? (s.stale ? html`<${Pill} k="amber">reopened<
 // ------------------------------------------------------------ issues
 export function Issues() {
   const s = useStore();
-  const [filter, setFilter] = useState("open");
+  const [filter, setFilter] = useState("errors");
   const [area, setArea] = useState("");
   const [sel, setSel] = useState(new Set());
-  const [exp, setExp] = useState(null);
   const sevRank = { high: 0, medium: 1, low: 2 };
-  let list = s.state.findings.filter((f) => (filter === "open" ? f.status === "open" : filter === "done" ? ["accepted", "resolved", "dismissed"].includes(f.status) : filter === "verified" ? f.status === "verified" : true));
-  if (area) list = list.filter((f) => f.area === area);
-  list.sort((a, b) => (a.kind === "error" ? 0 : 1) - (b.kind === "error" ? 0 : 1) || sevRank[a.severity] - sevRank[b.severity]);
+  const F = s.state.findings.filter((f) => !area || f.area === area);
+  const groups = {
+    errors: F.filter((f) => f.status === "open" && f.kind === "error"),
+    decide: F.filter((f) => f.status === "open" && f.kind !== "error"),
+    done: F.filter((f) => ["accepted", "resolved", "dismissed"].includes(f.status)),
+    verified: F.filter((f) => f.status === "verified"),
+  };
+  const list = [...groups[filter]].sort((a, b) => sevRank[a.severity] - sevRank[b.severity]);
   const acceptable = [...sel].map((id) => s.state.findings.find((f) => f.id === id)).filter((f) => f && f.status === "open" && f.proposal.length);
   const bulkAccept = async () => {
     const batch = "b-" + Date.now().toString(36);
@@ -70,25 +74,41 @@ export function Issues() {
     setSel(new Set());
     toast(`Accepted ${acceptable.length} adjustments.`, { batch });
   };
-  const counts = { open: s.state.findings.filter((f) => f.status === "open").length };
+  const toggle = (id) => { const n = new Set(sel); n.has(id) ? n.delete(id) : n.add(id); setSel(n); };
+  const sections = filter === "errors" || filter === "decide"
+    ? [["high", "High impact"], ["medium", "Medium"], ["low", "Low"]].map(([k, l]) => [l, list.filter((f) => f.severity === k)]).filter(([, x]) => x.length)
+    : [[null, list]];
+  const hint = { errors: "Wrong numbers on the return. Each one blocks filing until it's fixed or resolved with a reason.",
+    decide: "Not wrong numbers: calls a CPA has to make and record, like elections, outside filings and engine warnings.",
+    done: "Every decision keeps who made it, why, and the original number.", verified: "Things that look wrong but the checks proved right, so nobody 'fixes' them." }[filter];
   return html`<div class="stack">
-    <${Head} title="Findings" sub="Every check here recomputes from the source documents instead of trusting the engine. Errors block filing until they're adjusted or resolved with a reason; engine flags and judgment calls need a recorded decision.">
-      <${Seg} value=${filter} onChange=${setFilter} options=${[["open", `Open (${counts.open})`], ["done", "Decided"], ["verified", "Verified by check"], ["all", "All"]]} />
-      <select class="f" style="width:auto" onChange=${(e) => setArea(e.target.value)}><option value="">All areas</option>${s.meta.areas.map((a) => html`<option value=${a.id}>${a.label}</option>`)}</select>
-    <//>
-    ${sel.size ? html`<div class="sheet pad row" style="position:sticky;top:60px;z-index:5"><b>${sel.size} selected</b>
-      ${can("finding.accept") ? html`<button class="btn good" disabled=${!acceptable.length} onClick=${bulkAccept}>Accept ${acceptable.length} adjustment${acceptable.length === 1 ? "" : "s"}</button>` : null}
+    <${Head} title="Findings" sub="Each check recomputes from the source documents instead of trusting the engine. Click any card to see the proof." />
+    <div class="tabs" role="tablist">${[["errors", "Errors to fix", groups.errors.length], ["decide", "Needs a decision", groups.decide.length], ["done", "Decided", groups.done.length], ["verified", "Checked and right", groups.verified.length]].map(([k, l, n]) =>
+      html`<button role="tab" aria-selected=${filter === k} class=${"tab" + (filter === k ? " on" : "")} onClick=${() => { setFilter(k); setSel(new Set()); }}>${l}<span class=${"tabn" + (k === "errors" && n ? " red" : "")}>${n}</span></button>`)}
+      <select class="f areasel" onChange=${(e) => setArea(e.target.value)} aria-label="Area"><option value="">All areas</option>${s.meta.areas.map((a) => html`<option value=${a.id}>${a.label}</option>`)}</select></div>
+    <p class="hint">${hint}</p>
+    ${sel.size ? html`<div class="bulkbar"><b>${sel.size} selected</b>
+      ${can("finding.accept") ? html`<button class="btn good" disabled=${!acceptable.length} onClick=${bulkAccept}>Accept ${acceptable.length} fix${acceptable.length === 1 ? "" : "es"}</button>` : null}
       <button class="btn" onClick=${() => setSel(new Set())}>Clear</button><span class="small muted">One batch, one undo.</span></div>` : null}
-    <div class="sheet">${list.length ? list.map((f) => html`<div class=${"issue" + (sel.has(f.id) ? " sel" : "")}>
-      <input type="checkbox" aria-label="Select" checked=${sel.has(f.id)} onChange=${() => { const n = new Set(sel); n.has(f.id) ? n.delete(f.id) : n.add(f.id); setSel(n); }} />
-      <div><div class="row" style="gap:8px">${statusPill(f)} <${Pill} k=${f.severity}>${f.severity}<//> <span class="faint small">${areaLabel(f.area)}</span> <span class="engine-tag">· ${engineTag(f)}</span></div>
-        <div class="title" style="margin-top:4px"><a style="color:var(--ink)" onClick=${() => setExp(exp === f.id ? null : f.id)}>${f.title}</a></div>
-        <div class="small muted">${f.plain}</div>
-        ${exp === f.id ? html`<div class="issue-detail">${f.detail}<div style="margin-top:6px"><b>Fix:</b> ${f.fix}</div><${Refs} refs=${f.sources} /><${Refs} refs=${f.lines.filter((l) => s.meta.lineIndex[l])} /></div>` : null}
-      </div>
-      <div class="effect"><${Effect} te=${f.tax_effect} pe=${f.payment_effect} /><button class="btn small" style="margin-top:6px" onClick=${() => trace(f.id)}>Open</button></div>
-    </div>`) : html`<div class="empty">Nothing here. Switch filters to see decided items.</div>`}</div>
+    ${list.length ? sections.map(([title, items]) => html`
+      ${title ? html`<h3 class="grouph">${title} <span>${items.length}</span></h3>` : null}
+      <div class="cards">${items.map((f) => html`<div class=${"fcard sev-" + f.severity + (sel.has(f.id) ? " sel" : "")} role="button" tabindex="0" onClick=${() => trace(f.id)} onKeyDown=${(e) => e.key === "Enter" && trace(f.id)}>
+        ${f.status === "open" && f.proposal.length && can("finding.accept") ? html`<input type="checkbox" class="fcheck" aria-label="Select" checked=${sel.has(f.id)} onClick=${(e) => e.stopPropagation()} onChange=${() => toggle(f.id)} />` : html`<span class="fcheck"></span>`}
+        <div class="fbody">
+          <div class="ftitle">${f.title}</div>
+          <div class="fplain">${f.plain}</div>
+          <div class="fmeta">${areaLabel(f.area)}${engineTag(f) ? html` <span class="dot">·</span> ${engineTag(f)}` : null}${filter === "done" ? html` <span class="dot">·</span> ${statusPill(f)}` : null}</div>
+        </div>
+        <div class="feff">${fx(f)}</div>
+      </div>`)}</div>`) : html`<div class="sheet empty">${filter === "errors" ? "No errors left to fix." : "Nothing here."}</div>`}
   </div>`;
+}
+
+function fx(f) {
+  const te = f.tax_effect || {}, pe = f.payment_effect || {};
+  const row = (label, v) => (v ? html`<div><span>${label}</span><b>${signed(v)}</b></div>` : null);
+  const rows = [row("Federal tax", te.federal), row("California tax", te.california), row("Fed. payments", pe.federal), row("CA payments", pe.california)].filter(Boolean);
+  return rows.length ? rows : html`<div class="none">${f.kind === "error" ? "Blocks filing" : "No tax change"}</div>`;
 }
 
 // ------------------------------------------------------------ the return, line by line
