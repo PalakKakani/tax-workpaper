@@ -6,46 +6,68 @@ const Head = ({ title, sub, children }) => html`<div class="page-head"><div><h1>
 export { Head };
 
 // ------------------------------------------------------------ overview
+function Ring({ value, total }) {
+  const r = 52, c = 2 * Math.PI * r, frac = total ? value / total : 1;
+  return html`<svg width="132" height="132" viewBox="0 0 120 120" role="img" aria-label=${`${value} of ${total} findings decided`} style="flex-shrink:0">
+    <defs><linearGradient id="ringg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a79bff" /><stop offset="1" stop-color="#60a5fa" /></linearGradient></defs>
+    <circle cx="60" cy="60" r=${r} fill="none" stroke="#222228" stroke-width="9" />
+    <circle cx="60" cy="60" r=${r} fill="none" stroke="url(#ringg)" stroke-width="9" stroke-linecap="round" transform="rotate(-90 60 60)"
+      stroke-dasharray=${c} stroke-dashoffset=${c * (1 - frac)} style="transition: stroke-dashoffset .9s ease-out" />
+    <text x="60" y="58" text-anchor="middle" fill="#ededef" font-size="25" font-weight="600">${value}/${total}</text>
+    <text x="60" y="77" text-anchor="middle" fill="#8b8d98" font-size="10.5">decided</text></svg>`;
+}
+
 export function Overview() {
   const s = useStore();
   const st = s.state, m = s.meta;
   const w = st.working;
   const v3 = m.versions[2].summary;
   const py = m.prior_year.summary;
+  const needAction = st.findings.filter((f) => f.kind !== "verified");
+  const decided = needAction.filter((f) => f.status !== "open").length;
   const openErr = st.findings.filter((f) => f.status === "open" && f.kind === "error");
+  const sevRank = { high: 0, medium: 1, low: 2 };
+  const top = [...openErr].sort((a, b) => sevRank[a.severity] - sevRank[b.severity]).slice(0, 6);
   const fedDue = w.federal.balance_due, caDue = w.california.balance_due;
-  const row = (k, v, base, prior) => html`<span class="k">${k}</span><span class="v">${money(v)}</span><span class=${"d " + (v !== base ? "" : "faint")}>${v !== base ? `engine ${money(base)}` : prior !== undefined ? `2024 ${money(prior)}` : ""}</span>`;
+  const blockers = st.filing.blockers;
+  const recon = (s.reconBreaks ?? null);
+  const row = (k, v, base, prior) => html`<span class="k">${k}</span><span class="v">${money(v)}</span><span class="d">${v !== base ? `engine ${money(base)}` : prior !== undefined ? `2024 ${money(prior)}` : ""}</span>`;
+  const stats = [
+    { l: "Documents", v: m.documents.length, s: `${m.counts.values.toLocaleString()} values read` },
+    { l: "Errors to fix", v: openErr.length, s: `${st.findings.filter((f) => f.kind === "error").length} found by checks`, c: openErr.length ? "red" : "green" },
+    { l: "Federal result", v: (fedDue > 0 ? "−" : "+") + money(Math.abs(fedDue)), s: `engine said ${v3.federal.balance_due > 0 ? "owe" : "refund"} ${money(Math.abs(v3.federal.balance_due))}`, c: fedDue > 0 ? "red" : "green" },
+    { l: "California result", v: (caDue > 0 ? "−" : "+") + money(Math.abs(caDue)), s: `engine said ${v3.california.balance_due > 0 ? "owe" : "refund"} ${money(Math.abs(v3.california.balance_due))}`, c: caDue > 0 ? "red" : "green" },
+  ];
   return html`<div class="stack">
-    <${Head} title="Okafor-Lindqvist · 2025 joint return" sub=${`Moved California → Texas on July 15. ${m.documents.length} documents, ${m.counts.values.toLocaleString()} extracted values, 3 engine runs. Numbers below are the engine's v3 plus every adjustment we've accepted, priced at the engine's per-dollar rates.`} />
-    <div class="sheet ledger">
-      <div><h3>Federal (Form 1040)</h3>
-        <div class="bottom-line ${fedDue > 0 ? "neg" : ""}">${fedDue > 0 ? "Owes " : "Refund "}${money(Math.abs(fedDue))}</div>
-        <div class="small muted" style="margin-bottom:10px">engine v3 said ${v3.federal.balance_due > 0 ? "owes" : "refund"} ${money(Math.abs(v3.federal.balance_due))}</div>
-        <div class="kv">${row("AGI (engine v3)", w.federal.agi, w.federal.agi, py["F1040.11"])}${row("Taxable income (engine v3)", w.federal.taxable_income, w.federal.taxable_income, py["F1040.15"])}
-          ${row("Total tax", w.federal.total_tax, v3.federal.total_tax, py["F1040.24"])}${row("Payments", w.federal.payments, v3.federal.payments, py["F1040.33"])}</div></div>
-      <div><h3>California (540NR, part-year)</h3>
-        <div class="bottom-line ${caDue > 0 ? "neg" : ""}">${caDue > 0 ? "Owes " : "Refund "}${money(Math.abs(caDue))}</div>
-        <div class="small muted" style="margin-bottom:10px">engine v3 said ${v3.california.balance_due > 0 ? "owes" : "refund"} ${money(Math.abs(v3.california.balance_due))}</div>
-        <div class="kv">${row("California AGI (engine v3)", w.california.ca_agi, w.california.ca_agi)}${row("Total tax", w.california.total_tax, v3.california.total_tax)}${row("Payments", w.california.payments, v3.california.payments)}</div></div>
+    <div><div class="muted small">Okafor-Lindqvist household · Tax year 2025 · moved California → Texas on July 15</div><h1 style="margin-top:4px">Overview</h1></div>
+    <div class="sheet hero">
+      <${Ring} value=${decided} total=${needAction.length} />
+      <div style="position:relative;z-index:1">
+        ${st.filing.frozen ? html`<span class="pill ok">Filed ${day(st.filing.frozen_at)}${st.filing.amending ? " · amending" : ""}</span>` : blockers.length ? html`<span class="pill high">Not ready to file</span>` : html`<span class="pill ok">Ready to file</span>`}
+        <h2>${st.filing.frozen ? "Filed and frozen" : blockers.length ? `${blockers.length} things block filing` : "Everything is signed and ready"}</h2>
+        <p>${st.filing.frozen ? "Any change from here is an amendment on top of what was filed." : blockers.length ? blockers.slice(0, 3).join(" · ") + (blockers.length > 3 ? " · …" : "") : "Every area has fresh sign-offs and the client has approved."}</p>
+        <div class="row" style="margin-top:14px"><a class="btn primary" href="#/issues">Review findings</a><a class="btn" href="#/filing">Filing checklist</a></div>
+      </div>
     </div>
-    <div class="grid3">
-      <div class="sheet pad"><h3>Ready to file?</h3>
-        ${st.filing.frozen ? html`<p class="ok-text">Filed and frozen ${day(st.filing.frozen_at)}${st.filing.amending ? " · amendment in progress" : ""}</p>` : null}
-        <ul class="gate" style="padding-left:18px;margin:8px 0 0">${st.filing.blockers.length ? st.filing.blockers.map((b) => html`<li class="block">${b}</li>`) : html`<li class="done">Nothing blocks filing.</li>`}</ul>
-        <a class="small" href="#/filing">Open filing</a></div>
-      <div class="sheet pad"><h3>What we found</h3>
-        <p style="margin-top:6px"><b class="neg">${openErr.length}</b> open errors · <b>${st.findings.filter((f) => f.status === "accepted").length}</b> adjusted · <b>${st.findings.filter((f) => f.status === "resolved").length}</b> resolved</p>
-        <p class="small muted">Federal tax ${signed(w.delta.federal_tax)}, California ${signed(w.delta.california_tax)} versus the engine. Payments ${signed(w.delta.federal_payments)} / ${signed(w.delta.california_payments)}.</p>
-        <a class="small" href="#/issues">Review findings</a></div>
-      <div class="sheet pad"><h3>Changed since you last looked</h3>
-        ${st.since_last_seen.length ? html`${st.since_last_seen.slice(-5).reverse().map((e) => html`<div class="small" style="margin-top:4px">${describeEvent(e)} <span class="faint">${day(e.at)}</span></div>`)}
-          <button class="btn small" style="margin-top:8px" onClick=${() => act("seen", {}, { toast: "Marked as seen." })}>Mark all as seen</button>` : html`<p class="small muted">Nothing new.</p>`}
-        <a class="small" href="#/activity">All activity</a></div>
+    <div class="stats">${stats.map((x) => html`<div class="sheet stat"><div class="l">${x.l}</div><div class=${"v " + (x.c || "")}>${x.v}</div><div class="s">${x.s}</div></div>`)}</div>
+    <div class="grid2" style="grid-template-columns: minmax(0, 3fr) minmax(0, 2fr)">
+      <div class="sheet pad"><div class="row" style="justify-content:space-between"><h3>Needs you</h3><a class="small" href="#/issues">All findings</a></div>
+        ${top.length ? html`<ul class="list" style="margin-top:6px">${top.map((f) => html`<li onClick=${() => trace(f.id)}>
+          <span class=${"ico " + (f.severity === "high" ? "red" : f.severity === "medium" ? "amber" : "zinc")}>!</span>
+          <span class="t"><b>${f.title}</b><span>${f.plain}</span></span><span class="go">›</span></li>`)}</ul>` : html`<p class="muted" style="margin-top:12px">No errors left to fix.</p>`}</div>
+      <div class="stack" style="margin-top:0">
+        <div class="sheet pad"><h3>Federal (Form 1040)</h3><div class="kv" style="margin-top:10px">${row("AGI", w.federal.agi, w.federal.agi, py["F1040.11"])}${row("Total tax", w.federal.total_tax, v3.federal.total_tax, py["F1040.24"])}${row("Payments", w.federal.payments, v3.federal.payments, py["F1040.33"])}</div></div>
+        <div class="sheet pad"><h3>California (540NR)</h3><div class="kv" style="margin-top:10px">${row("CA AGI", w.california.ca_agi, w.california.ca_agi)}${row("Total tax", w.california.total_tax, v3.california.total_tax)}${row("Payments", w.california.payments, v3.california.payments)}</div>
+          <p class="small faint" style="margin:10px 0 0">Tax and payments include accepted fixes, priced at the engine's rates.</p></div>
+        <div class="sheet pad"><div class="row" style="justify-content:space-between"><h3>Since you last looked</h3><a class="small" href="#/activity">All activity</a></div>
+          ${st.since_last_seen.length ? html`${st.since_last_seen.slice(-4).reverse().map((e) => html`<div class="small muted" style="margin-top:8px">${describeEvent(e)}</div>`)}
+            <button class="btn small" style="margin-top:12px" onClick=${() => act("seen", {}, { toast: "Marked as seen." })}>Mark all as seen</button>` : html`<p class="small muted" style="margin-top:8px">Nothing new.</p>`}</div>
+      </div>
     </div>
     <div class="sheet"><div class="section-title"><h3>Areas</h3><a class="small" href="#/areas">Sign-off board</a></div>
-      <table><thead><tr><th>Area</th><th>Open</th><th>Preparer</th><th>Reviewer</th><th class="num">Hours / budget</th></tr></thead><tbody>
+      <table><thead><tr><th>Area</th><th>Status</th><th>Preparer</th><th>Reviewer</th><th class="num">Hours / budget</th></tr></thead><tbody>
       ${Object.values(st.areas).map((a) => html`<tr class="click" onClick=${() => (location.hash = "#/areas")}><td>${a.label}</td>
-        <td>${a.open_findings.length ? html`<${Pill} k="high">${a.open_findings.length} open<//>` : html`<${Pill} k="ok">clear<//>`} ${a.open_review_notes.length ? html`<${Pill} k="blue">${a.open_review_notes.length} review note<//>` : ""}</td>
+        <td>${a.open_findings.length ? html`<${Pill} k="high">${a.open_findings.length} open<//>` : html`<${Pill} k="ok">clear<//>`} ${a.open_review_notes.length ? html`<${Pill} k="blue">${a.open_review_notes.length} note<//>` : ""}</td>
         <td>${signCell(a.signoffs.preparer)}</td><td>${signCell(a.signoffs.reviewer)}</td><td class="num">${a.hours} / ${a.budget ?? "–"}</td></tr>`)}
       </tbody></table></div>
   </div>`;
@@ -94,6 +116,7 @@ export function Issues() {
       ${title ? html`<h3 class="grouph">${title} <span>${items.length}</span></h3>` : null}
       <div class="cards">${items.map((f) => html`<div class=${"fcard sev-" + f.severity + (sel.has(f.id) ? " sel" : "")} role="button" tabindex="0" onClick=${() => trace(f.id)} onKeyDown=${(e) => e.key === "Enter" && trace(f.id)}>
         ${f.status === "open" && f.proposal.length && can("finding.accept") ? html`<input type="checkbox" class="fcheck" aria-label="Select" checked=${sel.has(f.id)} onClick=${(e) => e.stopPropagation()} onChange=${() => toggle(f.id)} />` : html`<span class="fcheck"></span>`}
+        <span class="ico" aria-hidden="true">${f.kind === "error" ? "!" : f.status === "verified" ? "✓" : "?"}</span>
         <div class="fbody">
           <div class="ftitle">${f.title}</div>
           <div class="fplain">${f.plain}</div>

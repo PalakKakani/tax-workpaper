@@ -106,8 +106,8 @@ function App() {
   const st = s.state.filing;
   return html`<div class="shell">
     <header class="top">
-      <div class="client"><b>Okafor-Lindqvist · 2025</b><span>Form 1040 + California 540NR · client ${s.meta.packet.client_id}</span></div>
-      <span class=${"status-chip" + (st.frozen ? " frozen" : "")}>${st.frozen ? (st.amending ? "Filed · amending" : "Filed · frozen") : st.blockers.length ? `${st.blockers.length} things block filing` : "Ready to file"}</span>
+      <div class="brand"><span class="logo" aria-hidden="true">W</span><div class="client"><b>Okafor-Lindqvist · 2025</b><span>Form 1040 + California 540NR · client ${s.meta.packet.client_id}</span></div></div>
+      <span class=${"status-chip" + (st.frozen ? " frozen" : st.blockers.length ? "" : " ready")}>${st.frozen ? (st.amending ? "Filed · amending" : "Filed · frozen") : st.blockers.length ? `${st.blockers.length} things block filing` : "Ready to file"}</span>
       ${isClient ? null : html`<${Search} />`}
       <div class="grow"></div>
       <${Bell} />
